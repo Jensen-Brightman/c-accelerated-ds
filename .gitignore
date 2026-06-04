@@ -11,11 +11,12 @@
 *.bak
 
 # Visual Studio temporary build directories
-[Dd]ebug/
-[Rr]elease/
+Debug/
+Release/
 x64/
 x86/
 .vs/
+*.vcxproj.user
 
 #VS Code Flags
 .vscode/.DS_Store
