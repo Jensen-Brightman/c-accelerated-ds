@@ -1,3 +1,26 @@
+# Visual Studio (C) Flags
+# Object files, libraries, and executables
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.lk
+*.msi
+*.tlb
+*.tlh
+*.bak
+
+# Visual Studio temporary build directories
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+.vs/
+
+#VS Code Flags
+.vscode/.DS_Store
+# .vscode/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
