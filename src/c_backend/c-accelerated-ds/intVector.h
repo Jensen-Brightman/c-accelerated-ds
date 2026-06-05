@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 
 typedef int VectorElem;
 typedef size_t VecSize;
@@ -17,27 +18,27 @@ typedef struct {
 } IntVector;
 
 // Instantiate methods
-IntVector* createIntVector(VecSize size, VecSize capacity);
-IntVector* createIntVectorInit(VecSize size, VecSize capacity, VectorElem initValue);
-void concatIntVector(IntVector** dest, const IntVector* a, const IntVector* b);
-IntVector* createIntVectorFromArray(const VectorElem* array, VecSize len);
+__declspec(dllexport) IntVector* createIntVector(VecSize size, VecSize capacity);
+__declspec(dllexport) IntVector* createIntVectorInit(VecSize size, VecSize capacity, VectorElem initValue);
+__declspec(dllexport) void concatIntVector(IntVector** dest, const IntVector* a, const IntVector* b);
+__declspec(dllexport) IntVector* createIntVectorFromArray(const VectorElem* array, VecSize len);
 
 
 // Push/Pop
-VectorElem popIntVector(IntVector* intVec, bool* success);
-void appendIntVector(IntVector* intVec, VectorElem value, bool* success);
+__declspec(dllexport) VectorElem popIntVector(IntVector* intVec, bool* success);
+__declspec(dllexport) void appendIntVector(IntVector* intVec, VectorElem value, bool* success);
 
 // Remove/insert
-void removeIntVector(IntVector* intVec, VecSize index);
-void insertIntVector(IntVector* intVec, VecSize index, VectorElem value, bool* success);
+__declspec(dllexport) void removeIntVector(IntVector* intVec, VecSize index);
+__declspec(dllexport) void insertIntVector(IntVector* intVec, VecSize index, VectorElem value, bool* success);
 
 // Search
-int searchIntVector(const IntVector* intVec, VectorElem value, VecSize startFrom);
+__declspec(dllexport) int searchIntVector(const IntVector* intVec, VectorElem value, VecSize startFrom);
 
 // Others
-void printIntVector(const IntVector* intVec);
-void freeIntVector(IntVector* intVec);
-
-
+__declspec(dllexport) void printIntVector(const IntVector* intVec);
+__declspec(dllexport) void freeIntVector(IntVector* intVec);
+__declspec(dllexport) VectorElem getIntVector(IntVector* intVec, VecSize index, bool* success);
+__declspec(dllexport) void setIntVector(IntVector* intVec, VecSize index, VectorElem value, bool* success);
 
 #endif // !INTVECTOR_H

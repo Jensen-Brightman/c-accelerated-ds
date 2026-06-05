@@ -237,3 +237,22 @@ void freeIntVector(IntVector* intVec) {
 	free(intVec->ptr);
 	free(intVec);
 }
+
+VectorElem getIntVector(IntVector* intVec, VecSize index, bool *success) {
+	if (index >= intVec->size) {
+		*success = false;
+		return;
+	}
+	*success = true;
+
+	return intVec->ptr[index];
+}
+void setIntVector(IntVector* intVec, VecSize index, VectorElem value, bool* success) {
+	if (index >= intVec->size) {
+		*success = false;
+		return;
+	}
+	*success = true;
+
+	intVec->ptr[index] = value;
+}
