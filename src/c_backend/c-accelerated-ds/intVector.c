@@ -2,7 +2,15 @@
 #include <stdlib.h>
 #include "intVector.h"
 
+// ERROR Checks
+#define CHK_NULL_PTR(ptr) do {if((ptr)==NULL) return VEC_NULL_PTR_ERR;}while(0)
+#define CHK_INDEX(i, upper) do {if((i)>=(upper)) return VEC_RANGE_ERR;}while(0)
+#define CHK_INDEX_LESS_THAN(i, upper) do {if((i)>(upper)) return VEC_RANGE_ERR;}while(0)
+#define CHK_INDEX_ZERO(i) do {if((i)==0) return VEC_RANGE_ERR;}while(0)
+#define CHK_MEM_ALLOC(ptr) do {if((ptr)==NULL) return VEC_ALLOC_MEM_ERR;}while(0)
+#define RET_SUCCESS() do {return VEC_SUCCESS;}while(0)
 
+// [NOTE](TO SELF) Should we taken 'size'? 
 IntVector* createIntVector(VecSize size, VecSize capacity) {
 	if (size > capacity) return NULL;
 
@@ -45,25 +53,23 @@ IntVector* createIntVectorInit(VecSize size, VecSize capacity, VectorElem initVa
 	return vec;
 }
 
-void concatIntVector(IntVector** dest, const IntVector* a, const IntVector* b) {
-	if (a == NULL || b == NULL) {
-		*dest = NULL;
-		return;
-	}
+ERR_CODE concatIntVector(IntVector** dest, const IntVector* a, const IntVector* b) {
+	CHK_NULL_PTR(a);
+	CHK_NULL_PTR(b);
 
 	VecSize newSize = a->size + b->size;
 
 	IntVector* vec = malloc(sizeof(IntVector));
 	if (vec == NULL) {
 		*dest = NULL;
-		return;
+		return VEC_ALLOC_MEM_ERR;
 	}
 
 	VectorElem* ptr = malloc(newSize * sizeof(VectorElem));
 	if (ptr == NULL) {
 		free(vec);
 		*dest = NULL;
-		return;
+		return VEC_ALLOC_MEM_ERR;
 	}
 
 	for (VecSize i = 0; i < a->size;i++) {
@@ -78,6 +84,8 @@ void concatIntVector(IntVector** dest, const IntVector* a, const IntVector* b) {
 	vec->ptr = ptr;
 	vec->size = newSize;
 	vec->capacity = newSize;
+
+	RET_SUCCESS();
 }
 
 IntVector* createIntVectorFromArray(const VectorElem* array, VecSize len) {
@@ -103,27 +111,20 @@ IntVector* createIntVectorFromArray(const VectorElem* array, VecSize len) {
 	return vec;
 }
 
-VectorElem popIntVector(IntVector* intVec, bool* success) {
-	if (intVec == NULL) {
-		if (success != NULL) *success = false;
-		return 0;
-	}
+ERR_CODE popIntVector(IntVector* intVec, VectorElem* outValue) {
+	CHK_NULL_PTR(intVec);
+	CHK_NULL_PTR(outValue);
+	CHK_INDEX_ZERO(intVec->size);
 
-	if (intVec->size == 0) {
-		if (success != NULL) *success = false;
-		return 0;
-	}
-	if (success != NULL) *success = true;
 	intVec->size--;
 
-	return intVec->ptr[intVec->size];
+	*outValue = intVec->ptr[intVec->size];
+
+	RET_SUCCESS();
 }
 
-void appendIntVector(IntVector* intVec, VectorElem value, bool* success) {
-	if (intVec == NULL) {		
-		if(success!=NULL) *success = false;
-		return;
-	}
+ERR_CODE appendIntVector(IntVector* intVec, VectorElem value) {
+	CHK_NULL_PTR(intVec);
 
 	if (intVec->size < intVec->capacity) {
 		intVec->ptr[intVec->size] = value;
@@ -132,10 +133,8 @@ void appendIntVector(IntVector* intVec, VectorElem value, bool* success) {
 	else {
 		VecSize newCapacity = (intVec->capacity == 0) ? 4 : intVec->capacity * 2;
 		VectorElem* ptr = realloc(intVec->ptr, newCapacity * sizeof(VectorElem));
-		if (ptr == NULL) {
-			if (success != NULL) *success = false;
-			return;
-		}
+		CHK_MEM_ALLOC(ptr);
+
 		intVec->capacity = newCapacity;
 		intVec->size++;
 
@@ -143,29 +142,25 @@ void appendIntVector(IntVector* intVec, VectorElem value, bool* success) {
 		intVec->ptr = ptr;
 	}
 
-	if (success != NULL) *success = true;
+	RET_SUCCESS();
 }
 
 
-void removeIntVector(IntVector* intVec, VecSize index) {
-	if (intVec == NULL || index >= intVec->size) return;
+ERR_CODE removeIntVector(IntVector* intVec, VecSize index) {
+	CHK_NULL_PTR(intVec);
+	CHK_INDEX(index, intVec->size);
 
 	for (VecSize i = index; i < intVec->size - 1; i++) {
 		intVec->ptr[i] = intVec->ptr[i + 1];
 	}
 	intVec->size--;
+
+	RET_SUCCESS();
 }
 
-void insertIntVector(IntVector* intVec, VecSize index, VectorElem value, bool* success) {
-	if (intVec == NULL) {
-		if (success != NULL) *success = false;
-		return;
-	}
-
-	if (index > intVec->size) {
-		if (success != NULL) *success = false;
-		return;
-	}
+ERR_CODE insertIntVector(IntVector* intVec, VecSize index, VectorElem value) {
+	CHK_NULL_PTR(intVec);
+	CHK_INDEX_LESS_THAN(index, intVec->size);
 
 	if (intVec->size < intVec->capacity) {
 		intVec->size++;
@@ -179,10 +174,7 @@ void insertIntVector(IntVector* intVec, VecSize index, VectorElem value, bool* s
 	else {
 		VecSize newCapacity = (intVec->capacity == 0) ? 4 : intVec->capacity * 2;
 		VectorElem* ptr = realloc(intVec->ptr, newCapacity * sizeof(VectorElem));
-		if (ptr == NULL) {
-			if (success != NULL) *success = false;
-			return;
-		}
+		CHK_MEM_ALLOC(ptr);
 
 		intVec->capacity = newCapacity;
 		intVec->size++;
@@ -196,7 +188,7 @@ void insertIntVector(IntVector* intVec, VecSize index, VectorElem value, bool* s
 		intVec->ptr[index] = value;
 	}
 
-	if (success != NULL) *success = true;
+	RET_SUCCESS();
 }
 
 
@@ -231,6 +223,13 @@ void printIntVector(const IntVector* intVec) {
 	printf("%zu\n", intVec->capacity);
 }
 
+// [NOTE] NOT IMPLEMENTED
+//char* stringifyIntVector(const IntVector* intVec) {
+//	if (intVec == NULL) return "[NULL IntVector]";
+//
+//
+//}
+
 void freeIntVector(IntVector* intVec) {
 	if (intVec == NULL) return;
 
@@ -238,21 +237,31 @@ void freeIntVector(IntVector* intVec) {
 	free(intVec);
 }
 
-VectorElem getIntVector(IntVector* intVec, VecSize index, bool *success) {
-	if (index >= intVec->size) {
-		*success = false;
-		return;
+char* errorToStr(ERR_CODE errorCode) {
+	switch (errorCode) {
+		case 0:  return "VEC_SUCCESS";
+		case 1:  return "VEC_NULL_PTR_ERR";
+		case 2:  return "VEC_ALLOC_MEM_ERR";
+		case 3:  return "VEC_RANGE_ERR";
+		default: return "VEC_UNKNWON_ERR";
 	}
-	*success = true;
-
-	return intVec->ptr[index];
 }
-void setIntVector(IntVector* intVec, VecSize index, VectorElem value, bool* success) {
-	if (index >= intVec->size) {
-		*success = false;
-		return;
-	}
-	*success = true;
+
+
+ERR_CODE getIntVector(const IntVector* intVec, VecSize index, VectorElem* outValue) {
+	CHK_NULL_PTR(intVec);
+	CHK_NULL_PTR(outValue);
+	CHK_INDEX(index, intVec->size);
+
+	*outValue = intVec->ptr[index];
+
+	RET_SUCCESS();
+}
+ERR_CODE setIntVector(IntVector* intVec, VecSize index, VectorElem value) {
+	CHK_NULL_PTR(intVec);
+	CHK_INDEX(index, intVec->size);
 
 	intVec->ptr[index] = value;
+
+	RET_SUCCESS();
 }
