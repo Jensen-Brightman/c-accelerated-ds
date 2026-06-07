@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 from cffi import FFI
 
 
@@ -35,7 +35,6 @@ class IntVector:
 
         // Others
         void printIntVector(const IntVector* intVec);
-        //char* stringifyIntVector(const IntVector* intVec); [NOTE] NOT IMPLEMENTED
         void freeIntVector(IntVector* intVec);
         char* errorToStr(ERR_CODE errorCode);
 
@@ -44,7 +43,7 @@ class IntVector:
         ERR_CODE setIntVector(IntVector* intVec, VecSize index, VectorElem value);
     """)
 
-    _C = _ffi.dlopen(os.path.abspath("dlls/c-accelerated-ds.dll"))
+    _C = _ffi.dlopen(str(Path(__file__).resolve().parent / "dlls" / "c-accelerated-ds.dll"))
 
     _createIntVector = _C.createIntVector
     _createIntVectorInit = _C.createIntVectorInit
@@ -108,7 +107,7 @@ class IntVector:
         else:
             raise ValueError("Arguments inconsistent, IntVector could not be created.")
 
-    def append(self, value) -> None:
+    def append(self, value: int) -> None:
         errorCode = IntVector._appendIntVector(self._vecPtr, value)
         if errorCode!=0:
             IntVector.raiseIntVectorError(errorCode)
@@ -135,19 +134,19 @@ class IntVector:
         
         return result
 
-    def __getitem__(self, index) -> int:
+    def __getitem__(self, index: int) -> int:
         errorCode = IntVector._getIntVector(self._vecPtr, index, self._outPtr)
         if errorCode!=0:
             IntVector.raiseIntVectorError(errorCode)
 
         return self._outPtr[0]
             
-    def __setitem__(self, index, value) -> None:
+    def __setitem__(self, index: int, value: int) -> None:
         errorCode = IntVector._setIntVector(self._vecPtr, index, value)
         if errorCode!=0:
             IntVector.raiseIntVectorError(errorCode)
 
-    def __add__(self, other: "IntVector"):
+    def __add__(self, other: "IntVector") -> "IntVector":
         if type(other) is not IntVector:
             raise ValueError("Cannot concatenate IntVec with other types.")
         
