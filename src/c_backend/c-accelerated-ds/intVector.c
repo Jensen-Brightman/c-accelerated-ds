@@ -10,7 +10,7 @@
 #define CHK_MEM_ALLOC(ptr) do {if((ptr)==NULL) return VEC_ALLOC_MEM_ERR;}while(0)
 #define RET_SUCCESS() do {return VEC_SUCCESS;}while(0)
 
-// [NOTE](TO SELF) Should we taken 'size'? 
+
 IntVector* createIntVector(VecSize size, VecSize capacity) {
 	if (size > capacity) return NULL;
 
@@ -222,13 +222,6 @@ void printIntVector(const IntVector* intVec) {
 	printf("  %zu/", intVec->size);
 	printf("%zu\n", intVec->capacity);
 }
-
-// [NOTE] NOT IMPLEMENTED
-//char* stringifyIntVector(const IntVector* intVec) {
-//	if (intVec == NULL) return "[NULL IntVector]";
-//
-//
-//}
 
 void freeIntVector(IntVector* intVec) {
 	if (intVec == NULL) return;

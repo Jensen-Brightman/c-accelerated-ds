@@ -31,7 +31,6 @@ __declspec(dllexport) IntVector* createIntVectorInit(VecSize size, VecSize capac
 __declspec(dllexport) ERR_CODE concatIntVector(IntVector** dest, const IntVector* a, const IntVector* b);
 __declspec(dllexport) IntVector* createIntVectorFromArray(const VectorElem* array, VecSize len);
 
-
 // Push/Pop
 __declspec(dllexport) ERR_CODE popIntVector(IntVector* intVec, VectorElem* outValue);
 __declspec(dllexport) ERR_CODE appendIntVector(IntVector* intVec, VectorElem value);
@@ -45,7 +44,6 @@ __declspec(dllexport) int searchIntVector(const IntVector* intVec, VectorElem va
 
 // Others
 __declspec(dllexport) void printIntVector(const IntVector* intVec);
-//__declspec(dllexport) char* stringifyIntVector(const IntVector* intVec); [NOTE] NOT IMPLEMENTED
 __declspec(dllexport) void freeIntVector(IntVector* intVec);
 __declspec(dllexport) char* errorToStr(ERR_CODE errorCode);
 
